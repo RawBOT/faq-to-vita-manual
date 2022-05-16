@@ -1,5 +1,6 @@
 #coding=utf-8                                                                                                                                                                              
 import io, os, sys, pathlib
+from optparse import OptionParser, OptionGroup
 import base64, urllib.request, zipfile
 import pdf2image
 from selenium import webdriver
@@ -74,22 +75,36 @@ def print_page():
     pdf_bytes = base64.b64decode(pdf_base64)
     
     # Convert PDF into PNG files
-    output_dir = "output"
+    output_dir = parser_options.output_dir
     pathlib.Path(output_dir).mkdir(exist_ok=True)
     pdf2image.convert_from_bytes(pdf_bytes, output_folder=output_dir, fmt="png", poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", size=(960,544))
 
     # with open('print.pdf', 'wb') as file:
     #     file.write(pdf_bytes)
 
+def setup_parser():
+    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 1.2")
+    parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
+    parser.add_option("-o", "--outputdir", dest="output",
+                      help="Output images to DIR", metavar="DIR")
+
+    parser.set_defaults(output_dir="output/", verbose=False)
+
+    return parser
+
 # Download required binaries
 download_reqs()
 
+parser = setup_parser()
+(parser_options, args) = parser.parse_args()
+
 options = webdriver.EdgeOptions()
 options.headless = True
+
 options.add_argument('window-size=960x544')
 driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
 
-url = sys.argv[1]
+url = args[0]
 driver.get(url)
 # driver.get("data:text/html;charset=utf-8," + html_content)
 
