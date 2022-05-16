@@ -132,8 +132,8 @@ dmypy.json
 .vs/
 .vscode/
 
-# bin
-bin/
+# 3rdparty binaries
+3rdparty/
 
 # Project specific
 [Mm]anual/

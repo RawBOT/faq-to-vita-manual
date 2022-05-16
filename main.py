@@ -1,9 +1,48 @@
 #coding=utf-8                                                                                                                                                                              
-import io, base64
+import io, os, sys, pathlib
+import base64, urllib.request, zipfile
 import pdf2image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.print_page_options import PrintOptions
+
+thirdparty_dir = pathlib.Path("3rdparty")
+
+# Downloads required binaries
+def download_reqs():
+    thirdparty_dir.mkdir(parents=True, exist_ok=True)
+
+    # Download and extract Poppler
+    path = pathlib.Path(thirdparty_dir / "poppler-22.04.0")
+    if not path.exists():
+        path.mkdir(parents=True)
+        url = 'https://github.com/oschwartz10612/poppler-windows/releases/download/v22.04.0-0/Release-22.04.0-0.zip'
+        filehandle, _ = urllib.request.urlretrieve(url)
+        with zipfile.ZipFile(filehandle, 'r') as zip:
+            # binary_files = [ file for file in zip.namelist() if file.startswith(str((path / "Library/bin/").relative_to(thirdparty_dir)).replace(os.sep, os.altsep)) ]
+            for file in zip.namelist():
+                if file.startswith(str((path / "Library/bin/").relative_to(thirdparty_dir)).replace(os.sep, os.altsep)):
+                    zip.extract(file, thirdparty_dir)
+
+        # Download license file
+        url = "https://raw.githubusercontent.com/oschwartz10612/poppler-windows/v22.04.0-0/LICENSE"
+        filehandle, _ = urllib.request.urlretrieve(url, str(path / "LICENSE"))
+
+    # Download browser drivers
+    path = pathlib.Path(thirdparty_dir / "browser_drivers")
+    if not path.exists():
+        path.mkdir(parents=True)
+        # Edge
+        url = "https://msedgedriver.azureedge.net/101.0.1210.47/edgedriver_win64.zip"
+        filehandle, _ = urllib.request.urlretrieve(url)
+        with zipfile.ZipFile(filehandle, 'r') as zip:
+            zip.extract("msedgedriver.exe", str(path))
+
+        # Firefox
+        # url = "https://github.com/mozilla/geckodriver/releases/download/v0.31.0/geckodriver-v0.31.0-win64.zip"
+        # filehandle, _ = urllib.request.urlretrieve(url)
+        # with zipfile.ZipFile(filehandle, 'r') as zip:
+        #     zip.extract("geckodriver.exe", str(path))
 
 # Take screenshot of page
 def screenshot_page():
@@ -40,10 +79,13 @@ def print_page():
     # with open('print.pdf', 'wb') as file:
     #     file.write(pdf_bytes)
 
+# Download required binaries
+download_reqs()
+
 options = webdriver.EdgeOptions()
 options.headless = True
 options.add_argument('window-size=960x544')
-driver = webdriver.Edge(options=options)
+driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
 
 url = sys.argv[1]
 driver.get(url)
