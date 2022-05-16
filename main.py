@@ -4,6 +4,7 @@ from optparse import OptionParser, OptionGroup
 import base64, urllib.request, zipfile
 import pdf2image
 import requests
+import urllib.parse
 from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -101,6 +102,20 @@ parser = setup_parser()
 (parser_options, args) = parser.parse_args()
 
 url = args[0]
+
+parsed_url = urllib.parse.urlparse(url)
+guide_id = os.path.basename(parsed_url.path)
+
+# Add query parameter "single=1" to URL if not there to produce a single page guide
+if "single=1" not in url:
+    parsed_query = urllib.parse.parse_qs(parsed_url.query)
+    if "single" not in parsed_query:
+        parsed_query['single'] = ['1']
+    else:
+        if '1' not in parsed_query['single']:
+            parsed_query['single'] = ['1']
+    new_query = urllib.parse.urlencode(parsed_query, doseq=1)
+    url = urllib.parse.urlunparse([new_query if i == 4 else x for i,x in enumerate(parsed_url)])
 
 session = requests.Session()
 response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
