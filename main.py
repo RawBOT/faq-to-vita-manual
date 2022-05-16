@@ -77,7 +77,7 @@ def print_page():
     # Convert PDF into PNG files
     output_dir = parser_options.output_dir
     pathlib.Path(output_dir).mkdir(exist_ok=True)
-    pdf2image.convert_from_bytes(pdf_bytes, output_folder=output_dir, fmt="png", poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", size=(960,544))
+    pdf2image.convert_from_bytes(pdf_bytes, output_folder=output_dir, fmt="png", output_file="out_", poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", size=(960,544), paths_only=True)
 
     # with open('print.pdf', 'wb') as file:
     #     file.write(pdf_bytes)
