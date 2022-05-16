@@ -3,6 +3,8 @@ import io, os, sys, pathlib
 from optparse import OptionParser, OptionGroup
 import base64, urllib.request, zipfile
 import pdf2image
+import requests
+from bs4 import BeautifulSoup
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.print_page_options import PrintOptions
@@ -98,24 +100,20 @@ download_reqs()
 parser = setup_parser()
 (parser_options, args) = parser.parse_args()
 
+url = args[0]
+
+session = requests.Session()
+response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
+soup = BeautifulSoup(response.text, features="html.parser")
+faq_body = soup.find('div', class_="ffaqbody")
+html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
+
 options = webdriver.EdgeOptions()
 options.headless = True
-
 options.add_argument('window-size=960x544')
+
 driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
-
-url = args[0]
-driver.get(url)
-# driver.get("data:text/html;charset=utf-8," + html_content)
-
-# Remove scrollbar
-#driver.execute_script('document.styleSheets[0].insertRule("body {overflow: hidden;}", 0 )')
-
-# Remove cookie overlay
-# Remove by removing element
-driver.execute_script("document.getElementById('onetrust-consent-sdk').remove();")
-# Remove by clicking accept button (doesn't work)
-#driver.find_element(by=By.XPATH, value='//*[@id="onetrust-accept-btn-handler"]').click()
+driver.get("data:text/html;charset=utf-8," + html_content)
 
 # screenshot_page()
 print_page()
