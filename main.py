@@ -107,15 +107,17 @@ def print_page():
     #     file.write(pdf_bytes)
 
 def setup_parser():
-    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 0.1")
+    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 0.2")
     parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
+    parser.add_option("-f", "--formatted", action="store_true", dest="formatted",
+                      help="Outputs guide with CSS styling. May not look correct.")
     parser.add_option("-s", "--size", dest="paper_size", default="medium",
                       help="Size of text: small, medium or large. Maximum number of pages allowed"
                       "is 999, any more and the Vita manual option will crash [default: %default]")
     parser.add_option("-o", "--outputdir", dest="output_dir",
                       help="Output images to DIR", metavar="DIR")
 
-    parser.set_defaults(output_dir="output/", verbose=False)
+    parser.set_defaults(output_dir="output/", formatted=False)
 
     return parser
 
@@ -163,9 +165,14 @@ if __name__ == "__main__":
                            + '-' + os.path.basename(img_tag.attrs['src'][:-1]) + '.jpg'
 
         img_tag.attrs['width'] = "auto"
-        img_tag.attrs['height'] = "260%"
+        img_tag.attrs['height'] = "100%" if parser_options.formatted == True else "260%"
 
     html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
+
+    if parser_options.formatted == True:
+        css_stylesheet_tag = soup.find(attrs={"rel":"stylesheet"})
+        css_stylesheet_tag.attrs['href'] = 'https://' + parsed_url.hostname + css_stylesheet_tag.attrs['href']
+        html_content = '<head>' + str(css_stylesheet_tag) + '</head>' + html_content
 
     options = webdriver.EdgeOptions()
     options.headless = True
