@@ -132,7 +132,7 @@ if __name__ == "__main__":
     session = requests.Session()
     response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X;" \
                                         "en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
-    soup = BeautifulSoup(response.text, features="html.parser")
+    soup = BeautifulSoup(response.text, features="html5lib")
 
     faq_body = soup.find('div', class_="ffaqbody")
     # Fix images when ?single=1 is used
