@@ -134,7 +134,7 @@ if __name__ == "__main__":
                                         "en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
     soup = BeautifulSoup(response.text, features="html5lib")
 
-    faq_body = soup.find('div', class_="ffaqbody")
+    faq_body = soup.find('div', id="faqwrap")
     # Fix images when ?single=1 is used
     for img_tag in faq_body.find_all('img'):
         # Convert from format e.g. '/ffaq/3/202/' to e.g. /a/faqs/79/76979-202.jpg
