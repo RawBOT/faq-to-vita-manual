@@ -106,53 +106,54 @@ def setup_parser():
 
     return parser
 
-# Download required binaries
-download_reqs()
+if __name__ == "__main__":
+    # Download required binaries
+    download_reqs()
 
-parser = setup_parser()
-(parser_options, args) = parser.parse_args()
+    parser = setup_parser()
+    (parser_options, args) = parser.parse_args()
 
-url = args[0]
+    url = args[0]
 
-parsed_url = urllib.parse.urlparse(url)
-guide_id = os.path.basename(parsed_url.path)
+    parsed_url = urllib.parse.urlparse(url)
+    guide_id = os.path.basename(parsed_url.path)
 
-# Add query parameter "single=1" to URL if not there to produce a single page guide
-if "single=1" not in url:
-    parsed_query = urllib.parse.parse_qs(parsed_url.query)
-    if "single" not in parsed_query:
-        parsed_query['single'] = ['1']
-    else:
-        if '1' not in parsed_query['single']:
+    # Add query parameter "single=1" to URL if not there to produce a single page guide
+    if "single=1" not in url:
+        parsed_query = urllib.parse.parse_qs(parsed_url.query)
+        if "single" not in parsed_query:
             parsed_query['single'] = ['1']
-    new_query = urllib.parse.urlencode(parsed_query, doseq=1)
-    url = urllib.parse.urlunparse([new_query if i == 4 else x for i,x in enumerate(parsed_url)])
+        else:
+            if '1' not in parsed_query['single']:
+                parsed_query['single'] = ['1']
+        new_query = urllib.parse.urlencode(parsed_query, doseq=1)
+        url = urllib.parse.urlunparse([new_query if i == 4 else x for i,x in enumerate(parsed_url)])
 
-session = requests.Session()
-response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X;" \
-                                     "en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
-soup = BeautifulSoup(response.text, features="html.parser")
+    session = requests.Session()
+    response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X;" \
+                                        "en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
+    soup = BeautifulSoup(response.text, features="html.parser")
 
-faq_body = soup.find('div', class_="ffaqbody")
-# Fix images when ?single=1 is used
-for img_tag in faq_body.find_all('img'):
-    # Convert from format e.g. '/ffaq/3/202/' to e.g. /a/faqs/79/76979-202.jpg
-    img_tag.attrs['src'] = 'https://' + parsed_url.hostname + '/a/faqs/' + guide_id[3:] + '/' + guide_id \
+    faq_body = soup.find('div', class_="ffaqbody")
+    # Fix images when ?single=1 is used
+    for img_tag in faq_body.find_all('img'):
+        # Convert from format e.g. '/ffaq/3/202/' to e.g. /a/faqs/79/76979-202.jpg
+        img_tag.attrs['src'] = 'https://' + parsed_url.hostname + '/a/faqs/' + guide_id[3:] + '/' + guide_id \
                            + '-' + os.path.basename(img_tag.attrs['src'][:-1]) + '.jpg'
 
-    img_tag.attrs['width'] = "auto"
-    img_tag.attrs['height'] = "260%"
+        img_tag.attrs['width'] = "auto"
+        img_tag.attrs['height'] = "260%"
 
-html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
+    html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
 
-options = webdriver.EdgeOptions()
-options.headless = True
-options.add_argument('window-size=960x544')
+    options = webdriver.EdgeOptions()
+    options.headless = True
+    options.add_argument('window-size=960x544')
 
-driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
-driver.get("data:text/html;charset=utf-8," + html_content)
+    driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
+    driver.get("data:text/html;charset=utf-8," + html_content)
 
-# screenshot_page()
-print_page()
+    # screenshot_page()
+    print_page()
 
-driver.quit()
+    driver.quit()
