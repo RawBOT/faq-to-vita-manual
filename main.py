@@ -1,5 +1,6 @@
 #coding=utf-8                                                                                                                                                                              
 import io, os, sys, pathlib
+import shutil
 from optparse import OptionParser, OptionGroup
 import base64, urllib.request, zipfile
 import pdf2image
@@ -79,9 +80,18 @@ def print_page():
     pdf_bytes = base64.b64decode(pdf_base64)
     
     # Convert PDF into PNG files
-    output_dir = parser_options.output_dir
-    pathlib.Path(output_dir).mkdir(exist_ok=True)
-    pdf2image.convert_from_bytes(pdf_bytes, output_folder=output_dir, fmt="png", output_file="out_", poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", size=(960,544), paths_only=True)
+    output_dir = pathlib.Path(parser_options.output_dir)
+    temp_dir = output_dir / "temp"
+    pathlib.Path(temp_dir).mkdir(parents=True, exist_ok=True)
+    output_files = pdf2image.convert_from_bytes(pdf_bytes, output_folder=temp_dir, fmt="png", output_file="out_",  
+                                                poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", 
+                                                size=(960,544), dpi=600, paths_only=True)
+
+    # Rename output files to Vita manual format, e.g. 001.png, 002.png, etc.
+    counter = 1
+    for filepath in output_files:
+        shutil.move(filepath, output_dir / "{0:03d}.png".format(counter))
+        counter = counter + 1
 
     # with open('print.pdf', 'wb') as file:
     #     file.write(pdf_bytes)
