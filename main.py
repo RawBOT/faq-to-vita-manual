@@ -1,6 +1,6 @@
 #coding=utf-8                                                                                                                                                                              
 import io, os, sys, pathlib
-import shutil
+import shutil, tempfile
 from optparse import OptionParser, OptionGroup
 import base64, urllib.request, zipfile
 import pdf2image
@@ -151,9 +151,15 @@ if __name__ == "__main__":
     options.add_argument('window-size=960x544')
 
     driver = webdriver.Edge(thirdparty_dir / r"browser_drivers/msedgedriver.exe", options=options)
-    driver.get("data:text/html;charset=utf-8," + html_content)
 
-    # screenshot_page()
+    with tempfile.NamedTemporaryFile('w', encoding="utf-8", suffix=".html", delete=False) as temp_html_file:
+        temp_html_file.write(html_content)
+        temp_html_file.flush()
+
+    local_url = "file:///" + temp_html_file.name
+    driver.get(local_url)
     print_page()
+
+    os.remove(temp_html_file.name)
 
     driver.quit()
