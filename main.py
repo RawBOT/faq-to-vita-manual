@@ -120,7 +120,13 @@ if "single=1" not in url:
 session = requests.Session()
 response = session.get(url, headers={"user-agent": "Mozilla/5.0 (iPad; U; CPU OS 3_2_1 like Mac OS X; en-us) AppleWebKit/531.21.10 (KHTML, like Gecko) Mobile/7B405"})
 soup = BeautifulSoup(response.text, features="html.parser")
+
 faq_body = soup.find('div', class_="ffaqbody")
+# Fix images when ?single=1 is used
+for img_tag in faq_body.find_all('img'):
+    # Convert from format e.g. '/ffaq/3/202/' to e.g. /a/faqs/79/76979-202.jpg
+    img_tag.attrs['src'] = 'https://' + parsed_url.hostname + '/a/faqs/' + guide_id[3:] + '/' + guide_id + '-' + os.path.basename(img_tag.attrs['src'][:-1]) + '.jpg'
+
 html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
 
 options = webdriver.EdgeOptions()
