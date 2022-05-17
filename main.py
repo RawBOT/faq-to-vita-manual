@@ -167,7 +167,7 @@ if __name__ == "__main__":
         img_tag.attrs['width'] = "auto"
         img_tag.attrs['height'] = "100%" if parser_options.formatted == True else "260%"
 
-    html_content = str(faq_body).replace("#", "")  # remove # character, since it breaks parsing
+    html_content = str(faq_body)
 
     if parser_options.formatted == True:
         css_stylesheet_tag = soup.find(attrs={"rel":"stylesheet"})
