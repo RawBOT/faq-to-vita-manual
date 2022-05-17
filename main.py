@@ -1,4 +1,5 @@
-#coding=utf-8                                                                                                                                                                              
+# Copyright (c) 2022 RawBOT
+
 import io, os, sys, pathlib
 import shutil, tempfile
 from optparse import OptionParser, OptionGroup
@@ -106,12 +107,12 @@ def print_page():
     #     file.write(pdf_bytes)
 
 def setup_parser():
-    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 1.2")
+    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 0.1")
     parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
     parser.add_option("-s", "--size", dest="paper_size", default="medium",
                       help="Size of text: small, medium or large. Maximum number of pages allowed"
                       "is 999, any more and the Vita manual option will crash [default: %default]")
-    parser.add_option("-o", "--outputdir", dest="output",
+    parser.add_option("-o", "--outputdir", dest="output_dir",
                       help="Output images to DIR", metavar="DIR")
 
     parser.set_defaults(output_dir="output/", verbose=False)
@@ -128,6 +129,10 @@ if __name__ == "__main__":
 
     parser = setup_parser()
     (parser_options, args) = parser.parse_args()
+
+    if(len(args) == 0):
+        parser.print_help()
+        exit()
 
     url = args[0]
 
