@@ -63,12 +63,21 @@ def screenshot_page():
 
 # Print page into PDF, then convert that to PNG
 def print_page():
+    global driver, parser_options
     # Set page options
     print_options = PrintOptions()
     # Set ratio of paper to 16:9
-    print_options.page_width = 16
-    print_options.page_height = 9
-
+    if parser_options.paper_size == "small":
+        print_options.page_width = 19.5
+        print_options.page_height = 11.05
+    elif parser_options.paper_size == "large":
+        print_options.page_width = 12
+        print_options.page_height = 6.8
+    # elif parser_options.paper_size == "medium":
+    else:
+        print_options.page_width = 16
+        print_options.page_height = 9
+        
     # Add comfortable margins
     print_options.margin_top = 0.5
     print_options.margin_bottom = 0.5
@@ -99,12 +108,19 @@ def print_page():
 def setup_parser():
     parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 1.2")
     parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
+    parser.add_option("-s", "--size", dest="paper_size", default="medium",
+                      help="Size of text: small, medium or large. Maximum number of pages allowed"
+                      "is 999, any more and the Vita manual option will crash [default: %default]")
     parser.add_option("-o", "--outputdir", dest="output",
                       help="Output images to DIR", metavar="DIR")
 
     parser.set_defaults(output_dir="output/", verbose=False)
 
     return parser
+
+# Global vars
+driver = None
+parser_options = None
 
 if __name__ == "__main__":
     # Download required binaries
