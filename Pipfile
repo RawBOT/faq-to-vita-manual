@@ -1,0 +1,16 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+pdf2image = "*"
+requests = "*"
+bs4 = "*"
+html5lib = "*"
+selenium = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.8"
