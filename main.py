@@ -97,6 +97,12 @@ def print_page():
                                                 poppler_path=thirdparty_dir / "poppler-22.04.0/Library/bin", 
                                                 size=(960,544), dpi=600, paths_only=True)
 
+    # Warn user if more than 999 files were generated
+    if len(output_files) > 999:
+        print("WARNING: More than 999 images have been generated. Select a smaller size "
+              "using the '--size' switch, or delete the exceeding images before copying "
+              "to the Vita.")
+
     # Rename output files to Vita manual format, e.g. 001.png, 002.png, etc.
     counter = 1
     for filepath in output_files:
