@@ -113,7 +113,7 @@ def print_page():
     #     file.write(pdf_bytes)
 
 def setup_parser():
-    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 0.2")
+    parser = OptionParser(usage="%prog [OPTIONS] URL", version="%prog 1.0")
     parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
     parser.add_option("-f", "--formatted", action="store_true", dest="formatted",
                       help="Outputs guide with CSS styling. May not look correct.")
