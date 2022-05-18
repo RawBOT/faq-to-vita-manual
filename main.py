@@ -161,8 +161,13 @@ if __name__ == "__main__":
     # Fix images when ?single=1 is used
     for img_tag in faq_body.find_all('img'):
         # Convert from format e.g. '/ffaq/3/202/' to e.g. /a/faqs/79/76979-202.jpg
-        img_tag.attrs['src'] = 'https://' + parsed_url.hostname + '/a/faqs/' + guide_id[3:] + '/' + guide_id \
-                           + '-' + os.path.basename(img_tag.attrs['src'][:-1]) + '.jpg'
+        source = str(img_tag.attrs['src'])
+        if(source.endswith(".png") or source.endswith(".jpg")):
+            img_tag.attrs['src'] = 'https://' + parsed_url.hostname + source
+        else:
+            img_tag.attrs['src'] = 'https://' + parsed_url.hostname + '/a/faqs/' + guide_id[3:] + '/' + guide_id \
+                            + '-' + os.path.basename(source[:-1]) + '.jpg'
+
 
         img_tag.attrs['width'] = "auto"
         img_tag.attrs['height'] = "100%" if parser_options.formatted == True else "260%"
