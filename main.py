@@ -68,13 +68,13 @@ def print_page():
     # Set page options
     print_options = PrintOptions()
     # Set ratio of paper to 16:9
-    if parser_options.paper_size == "small":
+    if parser_options.text_size == "small":
         print_options.page_width = 19.5
         print_options.page_height = 11.05
-    elif parser_options.paper_size == "large":
+    elif parser_options.text_size == "large":
         print_options.page_width = 12
         print_options.page_height = 6.8
-    # elif parser_options.paper_size == "medium":
+    # elif parser_options.text_size == "medium":
     else:
         print_options.page_width = 16
         print_options.page_height = 9
@@ -117,8 +117,8 @@ def setup_parser():
     parser.set_description("Converts an online guide into PNG files to be used as a Vita manual.")
     parser.add_option("-f", "--formatted", action="store_true", dest="formatted",
                       help="Outputs guide with CSS styling. May not look correct.")
-    parser.add_option("-s", "--size", dest="paper_size", default="medium",
-                      help="Size of text: small, medium or large. Maximum number of pages allowed"
+    parser.add_option("-s", "--size", dest="text_size", default="medium",
+                      help="Size of text: small, medium or large. Maximum number of pages allowed "
                       "is 999, any more and the Vita manual option will crash [default: %default]")
     parser.add_option("-o", "--outputdir", dest="output_dir",
                       help="Output images to DIR", metavar="DIR")
